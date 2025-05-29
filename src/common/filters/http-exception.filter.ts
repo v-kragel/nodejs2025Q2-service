@@ -17,16 +17,12 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
+    const path = request.url;
+
     const isHttpException = exception instanceof HttpException;
     const status = isHttpException
       ? exception.getStatus()
       : new InternalServerErrorException().getStatus();
-
-    const message = isHttpException
-      ? exception.message
-      : 'Internal server error';
-
-    const path = request.url;
 
     if (
       status === 404 &&
@@ -35,17 +31,37 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       return;
     }
 
-    this.logger.error(`[${request.method}] ${path}`, {
-      status,
-      message,
-      stack: (exception as any)?.stack,
-    });
-
-    response.status(status).json({
+    let responseBody: any = {
       statusCode: status,
       timestamp: new Date().toISOString(),
       path,
-      message,
+      message: 'Internal server error',
+    };
+
+    if (isHttpException) {
+      const exceptionResponse = exception.getResponse();
+
+      if (typeof exceptionResponse === 'string') {
+        responseBody.message = exceptionResponse;
+      } else if (
+        typeof exceptionResponse === 'object' &&
+        exceptionResponse !== null
+      ) {
+        const { message, error } = exceptionResponse as any;
+
+        responseBody.message = message ?? 'Unexpected error';
+        if (error) {
+          responseBody.error = error;
+        }
+      }
+    }
+
+    this.logger.error(`[${request.method}] ${path}`, {
+      status: responseBody.statusCode,
+      message: responseBody.message,
+      stack: (exception as any)?.stack,
     });
+
+    response.status(status).json(responseBody);
   }
 }
