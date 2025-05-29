@@ -26,7 +26,16 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       ? exception.message
       : 'Internal server error';
 
-    this.logger.error(`[${request.method}] ${request.url}`, {
+    const path = request.url;
+
+    if (
+      status === 404 &&
+      (path.startsWith('/.well-known/') || path.includes('devtools'))
+    ) {
+      return;
+    }
+
+    this.logger.error(`[${request.method}] ${path}`, {
       status,
       message,
       stack: (exception as any)?.stack,
@@ -35,7 +44,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     response.status(status).json({
       statusCode: status,
       timestamp: new Date().toISOString(),
-      path: request.url,
+      path,
       message,
     });
   }
