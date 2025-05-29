@@ -29,13 +29,13 @@ export class InMemoryUsersRepository implements UsersRepository {
     this.users[index] = updatedUser;
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: string): Promise<boolean> {
     const index = this.users.findIndex((user) => user.id === id);
 
-    if (index === -1) {
-      throw new Error('User not found');
-    }
+    if (index === -1) return false;
 
     this.users.splice(index, 1);
+
+    return true;
   }
 }

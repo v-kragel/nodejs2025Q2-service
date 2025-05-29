@@ -23,22 +23,22 @@ export class UsersService {
     });
   }
 
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<UserResponseDto[]> {
     const users = await this.usersRepo.findAll();
     return users.map((user) => this.toResponseDto(user));
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<UserResponseDto> {
     const user = await this.usersRepo.findById(id);
 
     if (!user) {
-      throw new NotFoundException(`User with id <${id}> not found`);
+      throw new NotFoundException('User not found');
     }
 
     return this.toResponseDto(user);
   }
 
-  async create(dto: CreateUserDto): Promise<User> {
+  async create(dto: CreateUserDto): Promise<UserResponseDto> {
     const user: User = {
       id: v4(),
       login: dto.login,
@@ -53,11 +53,11 @@ export class UsersService {
     return this.toResponseDto(created);
   }
 
-  async update(userId: string, dto: UpdateUserDto): Promise<User> {
+  async update(userId: string, dto: UpdateUserDto): Promise<UserResponseDto> {
     const user = await this.usersRepo.findById(userId);
 
     if (!user) {
-      throw new NotFoundException(`User with id <${userId}> not found`);
+      throw new NotFoundException('User not found');
     }
 
     if (user.password !== dto.oldPassword) {
@@ -67,6 +67,7 @@ export class UsersService {
     const updatedUser: User = {
       ...user,
       password: dto.newPassword,
+      version: user.version + 1,
       updatedAt: Date.now(),
     };
 
@@ -76,12 +77,10 @@ export class UsersService {
   }
 
   async delete(userId: string): Promise<void> {
-    const user = await this.usersRepo.findById(userId);
+    const deleted = await this.usersRepo.delete(userId);
 
-    if (!user) {
-      throw new NotFoundException(`User with id <${userId}> not found`);
+    if (!deleted) {
+      throw new NotFoundException('User not found');
     }
-
-    await this.usersRepo.delete(userId);
   }
 }
