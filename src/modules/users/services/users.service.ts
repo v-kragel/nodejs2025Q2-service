@@ -57,7 +57,7 @@ export class UsersService {
     const user = await this.usersRepo.findById(userId);
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(`User with id <${userId}> not found`);
     }
 
     if (user.password !== dto.oldPassword) {
@@ -73,5 +73,15 @@ export class UsersService {
     await this.usersRepo.update(updatedUser);
 
     return this.toResponseDto(updatedUser);
+  }
+
+  async delete(userId: string): Promise<void> {
+    const user = await this.usersRepo.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException(`User with id <${userId}> not found`);
+    }
+
+    await this.usersRepo.delete(userId);
   }
 }
