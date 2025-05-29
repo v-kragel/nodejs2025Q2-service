@@ -1,6 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '../models';
-import { UsersRepository } from '../repositories/users.repository';
+import { UsersRepository } from '../repositories';
 
 @Injectable()
 export class UsersService {
@@ -9,7 +9,17 @@ export class UsersService {
     private readonly usersRepo: UsersRepository,
   ) {}
 
-  findAll(): Promise<User[]> {
-    return this.usersRepo.findAll();
+  async findAll(): Promise<User[]> {
+    return await this.usersRepo.findAll();
+  }
+
+  async findById(id: string) {
+    const user = await this.usersRepo.findById(id);
+
+    if (!user) {
+      throw new NotFoundException(`User with id <${id}> not found`);
+    }
+
+    return user;
   }
 }
