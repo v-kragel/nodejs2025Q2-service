@@ -1,7 +1,12 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { User } from '../models';
 import { UsersRepository } from '../repositories';
-import { CreateUserDto, UserResponseDto } from '../dto';
+import { CreateUserDto, UpdateUserDto, UserResponseDto } from '../dto';
 import { v4 } from 'uuid';
 import { plainToInstance } from 'class-transformer';
 
@@ -19,7 +24,8 @@ export class UsersService {
   }
 
   async findAll(): Promise<User[]> {
-    return await this.usersRepo.findAll();
+    const users = await this.usersRepo.findAll();
+    return users.map((user) => this.toResponseDto(user));
   }
 
   async findById(id: string) {
@@ -45,5 +51,27 @@ export class UsersService {
     const created = await this.usersRepo.create(user);
 
     return this.toResponseDto(created);
+  }
+
+  async update(userId: string, dto: UpdateUserDto): Promise<User> {
+    const user = await this.usersRepo.findById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.password !== dto.oldPassword) {
+      throw new ForbiddenException('Old password is incorrect');
+    }
+
+    const updatedUser: User = {
+      ...user,
+      password: dto.newPassword,
+      updatedAt: Date.now(),
+    };
+
+    await this.usersRepo.update(updatedUser);
+
+    return this.toResponseDto(updatedUser);
   }
 }

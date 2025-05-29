@@ -7,9 +7,10 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Put,
 } from '@nestjs/common';
 import { UsersService } from '../services';
-import { CreateUserDto } from '../dto';
+import { CreateUserDto, UpdateUserDto } from '../dto';
 import { User } from '../models';
 
 @Controller('user')
@@ -30,10 +31,21 @@ export class UsersController {
   }
 
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   async create(
     @Body()
     dto: CreateUserDto,
   ): Promise<User> {
     return this.usersService.create(dto);
+  }
+
+  @Put(':id')
+  @HttpCode(HttpStatus.OK)
+  async update(
+    @Param('id', new ParseUUIDPipe({ version: '4', errorHttpStatusCode: 400 }))
+    userId: string,
+    @Body() dto: UpdateUserDto,
+  ): Promise<User> {
+    return this.usersService.update(userId, dto);
   }
 }

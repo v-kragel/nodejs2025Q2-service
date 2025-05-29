@@ -18,4 +18,14 @@ export class InMemoryUsersRepository implements UsersRepository {
     this.users.push(user);
     return user;
   }
+
+  async update(updatedUser: User): Promise<void> {
+    const index = this.users.findIndex((u) => u.id === updatedUser.id);
+
+    if (index === -1) {
+      throw new Error('User not found');
+    }
+
+    this.users[index] = updatedUser;
+  }
 }
