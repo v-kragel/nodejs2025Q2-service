@@ -33,8 +33,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     let responseBody: any = {
       statusCode: status,
-      timestamp: new Date().toISOString(),
-      path,
       message: 'Internal server error',
     };
 

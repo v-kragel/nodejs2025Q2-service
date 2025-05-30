@@ -6,9 +6,8 @@ import {
 } from '@nestjs/common';
 import { User } from '../models';
 import { UsersRepository } from '../repositories';
-import { CreateUserDto, UpdateUserDto, UserResponseDto } from '../dto';
+import { CreateUserDto, UpdateUserDto } from '../dto';
 import { v4 } from 'uuid';
-import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class UsersService {
@@ -17,28 +16,21 @@ export class UsersService {
     private readonly usersRepo: UsersRepository,
   ) {}
 
-  private toResponseDto(user: User): UserResponseDto {
-    return plainToInstance(UserResponseDto, user, {
-      excludeExtraneousValues: true,
-    });
+  async findAll(): Promise<User[]> {
+    return await this.usersRepo.findAll();
   }
 
-  async findAll(): Promise<UserResponseDto[]> {
-    const users = await this.usersRepo.findAll();
-    return users.map((user) => this.toResponseDto(user));
-  }
-
-  async findById(id: string): Promise<UserResponseDto> {
+  async findById(id: string): Promise<User> {
     const user = await this.usersRepo.findById(id);
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    return this.toResponseDto(user);
+    return user;
   }
 
-  async create(dto: CreateUserDto): Promise<UserResponseDto> {
+  async create(dto: CreateUserDto): Promise<User> {
     const user: User = {
       id: v4(),
       login: dto.login,
@@ -48,12 +40,10 @@ export class UsersService {
       updatedAt: Date.now(),
     };
 
-    const created = await this.usersRepo.create(user);
-
-    return this.toResponseDto(created);
+    return await this.usersRepo.create(user);
   }
 
-  async update(userId: string, dto: UpdateUserDto): Promise<UserResponseDto> {
+  async update(userId: string, dto: UpdateUserDto): Promise<User> {
     const user = await this.usersRepo.findById(userId);
 
     if (!user) {
@@ -73,7 +63,7 @@ export class UsersService {
 
     await this.usersRepo.update(updatedUser);
 
-    return this.toResponseDto(updatedUser);
+    return updatedUser;
   }
 
   async delete(userId: string): Promise<void> {

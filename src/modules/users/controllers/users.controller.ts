@@ -11,42 +11,48 @@ import {
 } from '@nestjs/common';
 import { UsersService } from '../services';
 import { CreateUserDto, UpdateUserDto, UserResponseDto } from '../dto';
-import { UuidParamPipe } from '@/common/pipes/uuid-param.pipe';
+import { User } from '../models';
+import { Serialize } from '@/common/decorators';
+import { UuidParamPipe } from '@/common/pipes';
 
 @Controller('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Serialize(UserResponseDto)
   @Get()
-  findAll(): Promise<UserResponseDto[]> {
-    return this.usersService.findAll();
+  async findAll(): Promise<User[]> {
+    return await this.usersService.findAll();
   }
 
+  @Serialize(UserResponseDto)
   @Get(':id')
-  findOne(
+  async findOne(
     @Param('id', UuidParamPipe)
     id: string,
-  ): Promise<UserResponseDto> {
-    return this.usersService.findById(id);
+  ): Promise<User> {
+    return await this.usersService.findById(id);
   }
 
+  @Serialize(UserResponseDto)
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(
     @Body()
     dto: CreateUserDto,
-  ): Promise<UserResponseDto> {
-    return this.usersService.create(dto);
+  ): Promise<User> {
+    return await this.usersService.create(dto);
   }
 
+  @Serialize(UserResponseDto)
   @Put(':id')
   @HttpCode(HttpStatus.OK)
   async update(
     @Param('id', UuidParamPipe)
     id: string,
     @Body() dto: UpdateUserDto,
-  ): Promise<UserResponseDto> {
-    return this.usersService.update(id, dto);
+  ): Promise<User> {
+    return await this.usersService.update(id, dto);
   }
 
   @Delete(':id')
@@ -54,8 +60,7 @@ export class UsersController {
   async delete(
     @Param('id', UuidParamPipe)
     id: string,
-  ): Promise<undefined> {
+  ): Promise<void> {
     await this.usersService.delete(id);
-    return;
   }
 }
