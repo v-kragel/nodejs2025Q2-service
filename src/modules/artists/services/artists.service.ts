@@ -53,7 +53,7 @@ export class ArtistsService {
     const updatedArtist: Artist = {
       ...artist,
       name: dto.name || artist.name,
-      grammy: dto.grammy || artist.grammy,
+      grammy: dto.grammy ?? artist.grammy,
     };
 
     await this.artistsRepo.update(updatedArtist);
@@ -62,7 +62,7 @@ export class ArtistsService {
   }
 
   async delete(artistId: string): Promise<void> {
-    const artist = this.artistsRepo.findById(artistId);
+    const artist = await this.artistsRepo.findById(artistId);
 
     if (!artist) {
       throw new NotFoundException('Artist not found');
