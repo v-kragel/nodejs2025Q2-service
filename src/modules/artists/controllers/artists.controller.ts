@@ -22,7 +22,7 @@ export class ArtistsController {
   @Serialize(ArtistResponseDto)
   @Get()
   async findAll(): Promise<Artist[]> {
-    return this.artistsService.findAll();
+    return await this.artistsService.findAll();
   }
 
   @Serialize(ArtistResponseDto)
@@ -31,7 +31,7 @@ export class ArtistsController {
     @Param('id', UuidParamPipe)
     id: string,
   ): Promise<Artist> {
-    return this.artistsService.findById(id);
+    return await this.artistsService.findById(id);
   }
 
   @Serialize(ArtistResponseDto)

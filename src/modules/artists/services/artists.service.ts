@@ -3,12 +3,16 @@ import { Artist } from '../models';
 import { ArtistsRepository } from '../repositories';
 import { CreateArtistDto, UpdateArtistDto } from '../dto';
 import { v4 } from 'uuid';
+import { AlbumsService } from '@/modules/albums';
 
 @Injectable()
 export class ArtistsService {
   constructor(
     @Inject(ArtistsRepository)
     private readonly artistsRepo: ArtistsRepository,
+
+    @Inject(AlbumsService)
+    private readonly albumsService: AlbumsService,
   ) {}
 
   async findAll(): Promise<Artist[]> {
@@ -54,10 +58,14 @@ export class ArtistsService {
   }
 
   async delete(artistId: string): Promise<void> {
-    const deleted = await this.artistsRepo.delete(artistId);
+    const artist = this.artistsRepo.findById(artistId);
 
-    if (!deleted) {
+    if (!artist) {
       throw new NotFoundException('Artist not found');
     }
+
+    await this.albumsService.removeArtistReferences(artistId);
+
+    await this.artistsRepo.delete(artistId);
   }
 }

@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
 import { AlbumsController } from './controllers';
 import { AlbumsService } from './services';
-import { InMemoryAlbumsRepository } from './repositories';
+import { AlbumsRepository, InMemoryAlbumsRepository } from './repositories';
 
 @Module({
   controllers: [AlbumsController],
-  providers: [AlbumsService, InMemoryAlbumsRepository],
+  providers: [
+    AlbumsService,
+    { provide: AlbumsRepository, useClass: InMemoryAlbumsRepository },
+  ],
   exports: [AlbumsService],
 })
 export class AlbumsModule {}

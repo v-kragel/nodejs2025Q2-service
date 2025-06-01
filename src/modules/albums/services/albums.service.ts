@@ -1,12 +1,76 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Album } from '../models';
-import { InMemoryAlbumsRepository } from '../repositories';
+import { AlbumsRepository } from '../repositories';
+import { CreateAlbumDto, UpdateAlbumDto } from '../dto';
+import { v4 } from 'uuid';
 
 @Injectable()
 export class AlbumsService {
-  constructor(private readonly albumsRepo: InMemoryAlbumsRepository) {}
+  constructor(
+    @Inject(AlbumsRepository)
+    private readonly albumsRepo: AlbumsRepository,
+  ) {}
 
-  findAll(): Promise<Album[]> {
-    return this.albumsRepo.findAll();
+  async findAll(): Promise<Album[]> {
+    return await this.albumsRepo.findAll();
+  }
+
+  async findById(id: string): Promise<Album> {
+    const album = await this.albumsRepo.findById(id);
+
+    if (!album) {
+      throw new NotFoundException('Album not found');
+    }
+
+    return album;
+  }
+
+  async create(dto: CreateAlbumDto): Promise<Album> {
+    const album: Album = {
+      id: v4(),
+      name: dto.name,
+      year: dto.year,
+      artistId: dto.artistId || null,
+    };
+
+    return await this.albumsRepo.create(album);
+  }
+
+  async update(albumId: string, dto: UpdateAlbumDto): Promise<Album> {
+    const album = await this.albumsRepo.findById(albumId);
+
+    if (!album) {
+      throw new NotFoundException('Album not found');
+    }
+
+    const updatedAlbum: Album = {
+      ...album,
+      name: dto.name || album.name,
+      year: dto.year || album.year,
+      artistId: dto.artistId || album.artistId || null,
+    };
+
+    await this.albumsRepo.update(updatedAlbum);
+
+    return updatedAlbum;
+  }
+
+  async delete(albumId: string): Promise<void> {
+    const deleted = await this.albumsRepo.delete(albumId);
+
+    if (!deleted) {
+      throw new NotFoundException('Album not found');
+    }
+  }
+
+  async removeArtistReferences(artistId: string): Promise<void> {
+    const albums = await this.albumsRepo.findAllByArtistId(artistId);
+
+    const updated = albums.map((album) => ({
+      ...album,
+      artistId: null,
+    }));
+
+    this.albumsRepo.bulkUpdate(updated);
   }
 }
