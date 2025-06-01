@@ -39,8 +39,8 @@ export class InMemoryAlbumsRepository implements AlbumsRepository {
     return true;
   }
 
-  async findAllByArtistId(id: string): Promise<Album[]> {
-    return this.albums.filter((album) => album.artistId === id);
+  async findAllByArtistId(artistId: string): Promise<Album[]> {
+    return this.albums.filter((album) => album.artistId === artistId);
   }
 
   async bulkUpdate(albums: Album[]): Promise<void> {

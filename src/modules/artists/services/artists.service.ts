@@ -4,6 +4,7 @@ import { ArtistsRepository } from '../repositories';
 import { CreateArtistDto, UpdateArtistDto } from '../dto';
 import { v4 } from 'uuid';
 import { AlbumsService } from '@/modules/albums';
+import { TracksService } from '@/modules/tracks';
 
 @Injectable()
 export class ArtistsService {
@@ -13,6 +14,9 @@ export class ArtistsService {
 
     @Inject(AlbumsService)
     private readonly albumsService: AlbumsService,
+
+    @Inject(TracksService)
+    private readonly tracksService: TracksService,
   ) {}
 
   async findAll(): Promise<Artist[]> {
@@ -65,6 +69,8 @@ export class ArtistsService {
     }
 
     await this.albumsService.removeArtistReferences(artistId);
+
+    await this.tracksService.removeArtistReferences(artistId);
 
     await this.artistsRepo.delete(artistId);
   }

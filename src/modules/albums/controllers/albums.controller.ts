@@ -22,7 +22,7 @@ export class AlbumsController {
   @Serialize(AlbumResponseDto)
   @Get()
   async findAll() {
-    return this.albumsService.findAll();
+    return await this.albumsService.findAll();
   }
 
   @Serialize(AlbumResponseDto)

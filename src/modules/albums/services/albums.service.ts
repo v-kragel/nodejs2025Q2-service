@@ -3,12 +3,16 @@ import { Album } from '../models';
 import { AlbumsRepository } from '../repositories';
 import { CreateAlbumDto, UpdateAlbumDto } from '../dto';
 import { v4 } from 'uuid';
+import { TracksService } from '@/modules/tracks';
 
 @Injectable()
 export class AlbumsService {
   constructor(
     @Inject(AlbumsRepository)
     private readonly albumsRepo: AlbumsRepository,
+
+    @Inject(TracksService)
+    private readonly tracksService: TracksService,
   ) {}
 
   async findAll(): Promise<Album[]> {
@@ -56,11 +60,15 @@ export class AlbumsService {
   }
 
   async delete(albumId: string): Promise<void> {
-    const deleted = await this.albumsRepo.delete(albumId);
+    const album = await this.albumsRepo.findById(albumId);
 
-    if (!deleted) {
+    if (!album) {
       throw new NotFoundException('Album not found');
     }
+
+    await this.tracksService.removeAlbumReferences(albumId);
+
+    await this.albumsRepo.delete(albumId);
   }
 
   async removeArtistReferences(artistId: string): Promise<void> {
@@ -71,6 +79,6 @@ export class AlbumsService {
       artistId: null,
     }));
 
-    this.albumsRepo.bulkUpdate(updated);
+    await this.albumsRepo.bulkUpdate(updated);
   }
 }
