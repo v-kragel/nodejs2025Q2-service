@@ -31,7 +31,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       return;
     }
 
-    let responseBody: any = {
+    const responseBody: any = {
       statusCode: status,
       message: 'Internal server error',
     };
