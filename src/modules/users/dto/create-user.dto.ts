@@ -1,4 +1,11 @@
-export interface CreateUserDto {
+import { IsString, MinLength } from 'class-validator';
+
+export class CreateUserDto {
+  @IsString({ message: 'Login value must be string' })
+  @MinLength(3, { message: 'Login must be at least 3 characters long' })
   login: string;
+
+  @IsString({ message: 'Password value must be string' })
+  @MinLength(3, { message: 'Password must be at least 3 characters long' })
   password: string;
 }
