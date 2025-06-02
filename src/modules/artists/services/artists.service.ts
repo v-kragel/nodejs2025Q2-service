@@ -1,10 +1,16 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Artist } from '../models';
 import { ArtistsRepository } from '../repositories';
 import { CreateArtistDto, UpdateArtistDto } from '../dto';
 import { v4 } from 'uuid';
 import { AlbumsService } from '@/modules/albums';
 import { TracksService } from '@/modules/tracks';
+import { FavoritesService } from '@/modules/favorites';
 
 @Injectable()
 export class ArtistsService {
@@ -12,11 +18,14 @@ export class ArtistsService {
     @Inject(ArtistsRepository)
     private readonly artistsRepo: ArtistsRepository,
 
-    @Inject(AlbumsService)
+    @Inject(forwardRef(() => AlbumsService))
     private readonly albumsService: AlbumsService,
 
-    @Inject(TracksService)
+    @Inject(forwardRef(() => TracksService))
     private readonly tracksService: TracksService,
+
+    @Inject(forwardRef(() => FavoritesService))
+    private readonly favoritesService: FavoritesService,
   ) {}
 
   async findAll(): Promise<Artist[]> {
@@ -71,6 +80,8 @@ export class ArtistsService {
     await this.albumsService.removeArtistReferences(artistId);
 
     await this.tracksService.removeArtistReferences(artistId);
+
+    await this.favoritesService.removeArtist(artistId);
 
     await this.artistsRepo.delete(artistId);
   }
