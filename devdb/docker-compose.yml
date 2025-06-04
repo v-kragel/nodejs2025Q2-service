@@ -1,0 +1,49 @@
+networks:
+  app-network:
+    driver: bridge
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: rs_public_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - rs-postgres-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    networks:
+      - app-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: vlad.kragel.main@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: 111
+    ports:
+      - '5050:80'
+    depends_on:
+      - db
+    volumes:
+      - rs-pgadmin-data:/var/lib/pgadmin
+
+  app:
+    image: vladkragelmain/nest-app
+    container_name: nest_app
+    restart: always
+    ports:
+      - '4000:4000'
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+volumes:
+  rs-postgres-data:
+  rs-pgadmin-data:
