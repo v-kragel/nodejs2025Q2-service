@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { User } from '../models';
+import { CreateUserInput, User } from '../models';
 import { UsersRepository } from '../repositories';
 import { CreateUserDto, UpdateUserDto } from '../dto';
 import { v4 } from 'uuid';
@@ -31,13 +31,11 @@ export class UsersService {
   }
 
   async create(dto: CreateUserDto): Promise<User> {
-    const user: User = {
+    const user: CreateUserInput = {
       id: v4(),
       login: dto.login,
       password: dto.password,
       version: 1,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
     };
 
     return await this.usersRepo.create(user);
@@ -58,7 +56,6 @@ export class UsersService {
       ...user,
       password: dto.newPassword,
       version: user.version + 1,
-      updatedAt: Date.now(),
     };
 
     await this.usersRepo.update(updatedUser);

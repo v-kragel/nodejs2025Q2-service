@@ -1,8 +1,5 @@
-export interface User {
-  id: string;
-  login: string;
-  password: string;
-  version: number;
-  createdAt: number;
-  updatedAt: number;
-}
+import { Prisma } from '@prisma/client';
+
+export { User } from '@prisma/client';
+
+export type CreateUserInput = Prisma.UserCreateInput;

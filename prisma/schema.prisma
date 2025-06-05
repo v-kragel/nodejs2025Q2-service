@@ -18,8 +18,8 @@ model User {
   login     String @unique
   password  String
   version   Int
-  createdAt BigInt
-  updatedAt BigInt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   favorites Favorites?
 }
