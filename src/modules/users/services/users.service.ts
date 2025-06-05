@@ -52,22 +52,18 @@ export class UsersService {
       throw new ForbiddenException('Old password is incorrect');
     }
 
-    const updatedUser: User = {
-      ...user,
-      password: dto.newPassword,
-      version: user.version + 1,
-    };
-
-    await this.usersRepo.update(updatedUser);
+    const updatedUser = await this.usersRepo.update(userId, dto);
 
     return updatedUser;
   }
 
   async delete(userId: string): Promise<void> {
-    const deleted = await this.usersRepo.delete(userId);
+    const user = await this.usersRepo.findById(userId);
 
-    if (!deleted) {
+    if (!user) {
       throw new NotFoundException('User not found');
     }
+
+    await this.usersRepo.delete(userId);
   }
 }

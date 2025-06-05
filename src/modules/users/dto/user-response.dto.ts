@@ -1,4 +1,4 @@
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Transform } from 'class-transformer';
 
 export class UserResponseDto {
   @Expose()
@@ -11,9 +11,11 @@ export class UserResponseDto {
   version: number;
 
   @Expose()
+  @Transform(({ value }) => value.getTime())
   createdAt: number;
 
   @Expose()
+  @Transform(({ value }) => value.getTime())
   updatedAt: number;
 
   @Exclude()
