@@ -1,5 +1,5 @@
-export interface Artist {
-  id: string;
-  name: string;
-  grammy: boolean;
-}
+import { Prisma, PrismaClient, Artist as ArtistPrisma } from '@prisma/client';
+
+export type Artist = ArtistPrisma;
+
+export type CreateArtistInput = Prisma.ArtistCreateInput;

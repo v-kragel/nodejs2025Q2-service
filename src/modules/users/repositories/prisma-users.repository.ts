@@ -13,7 +13,7 @@ export class PrismaUsersRepository implements UsersRepository {
 
   async findById(id: string): Promise<User | null> {
     const user = await this.prisma.user.findUnique({ where: { id } });
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) return null;
     return user;
   }
 
@@ -23,7 +23,7 @@ export class PrismaUsersRepository implements UsersRepository {
 
   async update(updatedUser: User): Promise<User> {
     await this.findById(updatedUser.id);
-    return this.prisma.user.update({
+    return await this.prisma.user.update({
       where: { id: updatedUser.id },
       data: {
         ...updatedUser,
