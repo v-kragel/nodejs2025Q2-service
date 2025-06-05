@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient, Artist as ArtistPrisma } from '@prisma/client';
+import { Prisma, Artist as ArtistPrisma } from '@prisma/client';
 
 export type Artist = ArtistPrisma;
 

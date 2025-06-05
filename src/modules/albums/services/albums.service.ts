@@ -1,9 +1,4 @@
-import {
-  forwardRef,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Album } from '../models';
 import { AlbumsRepository } from '../repositories';
 import { CreateAlbumDto, UpdateAlbumDto } from '../dto';
