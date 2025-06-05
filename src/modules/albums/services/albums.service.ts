@@ -8,20 +8,12 @@ import { Album } from '../models';
 import { AlbumsRepository } from '../repositories';
 import { CreateAlbumDto, UpdateAlbumDto } from '../dto';
 import { v4 } from 'uuid';
-import { TracksService } from '@/modules/tracks';
-import { FavoritesService } from '@/modules/favorites';
 
 @Injectable()
 export class AlbumsService {
   constructor(
     @Inject(AlbumsRepository)
     private readonly albumsRepo: AlbumsRepository,
-
-    @Inject(forwardRef(() => TracksService))
-    private readonly tracksService: TracksService,
-
-    @Inject(forwardRef(() => FavoritesService))
-    private readonly favoritesService: FavoritesService,
   ) {}
 
   async findAll(): Promise<Album[]> {
@@ -75,21 +67,6 @@ export class AlbumsService {
       throw new NotFoundException('Album not found');
     }
 
-    await this.tracksService.removeAlbumReferences(albumId);
-
-    await this.favoritesService.removeAlbum(albumId);
-
     await this.albumsRepo.delete(albumId);
-  }
-
-  async removeArtistReferences(artistId: string): Promise<void> {
-    const albums = await this.albumsRepo.findAllByArtistId(artistId);
-
-    const updated = albums.map((album) => ({
-      ...album,
-      artistId: null,
-    }));
-
-    await this.albumsRepo.bulkUpdate(updated);
   }
 }

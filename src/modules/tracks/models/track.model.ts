@@ -1,7 +1,5 @@
-export interface Track {
-  id: string;
-  name: string;
-  artistId: string | null;
-  albumId: string | null;
-  duration: number;
-}
+import { Track as TrackPrisma, Prisma } from '@prisma/client';
+
+export type Track = TrackPrisma;
+
+export type CreateTrackInput = Prisma.TrackCreateInput;
