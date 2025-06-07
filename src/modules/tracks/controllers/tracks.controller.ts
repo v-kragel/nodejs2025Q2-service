@@ -10,9 +10,8 @@ import {
   Put,
 } from '@nestjs/common';
 import { TracksService } from '../services';
-import { Serialize } from '@/common/decorators';
+import { Serialize, UuidParamPipe } from '@/common';
 import { TrackResponseDto, CreateTrackDto, UpdateTrackDto } from '../dto';
-import { UuidParamPipe } from '@/common/pipes';
 import { Track } from '../models';
 
 @Controller('track')

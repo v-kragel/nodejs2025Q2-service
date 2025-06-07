@@ -10,9 +10,8 @@ import {
   Put,
 } from '@nestjs/common';
 import { AlbumsService } from '../services';
-import { Serialize } from '@/common/decorators';
+import { Serialize, UuidParamPipe } from '@/common';
 import { AlbumResponseDto, CreateAlbumDto, UpdateAlbumDto } from '../dto';
-import { UuidParamPipe } from '@/common/pipes';
 import { Album } from '../models';
 
 @Controller('album')

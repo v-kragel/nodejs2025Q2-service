@@ -12,8 +12,7 @@ import {
 import { UsersService } from '../services';
 import { CreateUserDto, UpdateUserDto, UserResponseDto } from '../dto';
 import { User } from '../models';
-import { Serialize } from '@/common/decorators';
-import { UuidParamPipe } from '@/common/pipes';
+import { Serialize, UuidParamPipe } from '@/common';
 
 @Controller('user')
 export class UsersController {

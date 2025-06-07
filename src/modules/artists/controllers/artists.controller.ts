@@ -12,8 +12,7 @@ import {
 import { ArtistsService } from '../services';
 import { Artist } from '../models';
 import { ArtistResponseDto, CreateArtistDto, UpdateArtistDto } from '../dto';
-import { UuidParamPipe } from '@/common/pipes';
-import { Serialize } from '@/common/decorators';
+import { UuidParamPipe, Serialize } from '@/common';
 
 @Controller('artist')
 export class ArtistsController {
