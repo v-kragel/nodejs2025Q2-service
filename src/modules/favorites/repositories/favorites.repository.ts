@@ -8,7 +8,4 @@ export abstract class FavoritesRepository {
   abstract removeArtist(artistId: string): Promise<void>;
   abstract removeAlbum(albumId: string): Promise<void>;
   abstract removeTrack(trackId: string): Promise<void>;
-  abstract isArtistFavorite(artistId: string): Promise<boolean>;
-  abstract isAlbumFavorite(albumId: string): Promise<boolean>;
-  abstract isTrackFavorite(trackId: string): Promise<boolean>;
 }

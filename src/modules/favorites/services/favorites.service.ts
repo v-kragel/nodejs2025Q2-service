@@ -1,14 +1,14 @@
 import {
-  forwardRef,
   Inject,
   Injectable,
+  NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { FavoritesRepository } from '../repositories';
 import { ArtistsService } from '@/modules/artists';
 import { AlbumsService } from '@/modules/albums';
 import { TracksService } from '@/modules/tracks';
-import { FavoritesResponseDto } from '../dto';
+import { Favorites } from '../models';
 
 @Injectable()
 export class FavoritesService {
@@ -16,42 +16,31 @@ export class FavoritesService {
     @Inject(FavoritesRepository)
     private readonly favoritesRepo: FavoritesRepository,
 
-    @Inject(forwardRef(() => ArtistsService))
+    @Inject(ArtistsService)
     private readonly artistsService: ArtistsService,
 
-    @Inject(forwardRef(() => AlbumsService))
+    @Inject(AlbumsService)
     private readonly albumsService: AlbumsService,
 
-    @Inject(forwardRef(() => TracksService))
+    @Inject(TracksService)
     private readonly tracksService: TracksService,
   ) {}
 
-  async getAll(): Promise<FavoritesResponseDto> {
-    const {
-      artists: artistIds,
-      albums: albumIds,
-      tracks: trackIds,
-    } = await this.favoritesRepo.getAll();
-
-    const storedArtists = await this.artistsService.findAll();
-    const storedAlbums = await this.albumsService.findAll();
-    const storedTracks = await this.tracksService.findAll();
-
-    return {
-      artists: storedArtists.filter((a) => artistIds.includes(a.id)),
-      albums: storedAlbums.filter((a) => albumIds.includes(a.id)),
-      tracks: storedTracks.filter((t) => trackIds.includes(t.id)),
-    };
+  async getAll(): Promise<Favorites> {
+    return await this.favoritesRepo.getAll();
   }
 
   async addArtist(id: string): Promise<void> {
-    const artists = await this.artistsService.findAll();
+    try {
+      await this.artistsService.findById(id);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new UnprocessableEntityException('Artist not found');
+      }
+      throw error;
+    }
 
-    const artist = artists.find((a) => a.id === id);
-
-    if (!artist) throw new UnprocessableEntityException(`Artist not found`);
-
-    this.favoritesRepo.addArtist(id);
+    await this.favoritesRepo.addArtist(id);
   }
 
   async removeArtist(id: string): Promise<void> {
@@ -59,13 +48,16 @@ export class FavoritesService {
   }
 
   async addAlbum(id: string): Promise<void> {
-    const albums = await this.albumsService.findAll();
+    try {
+      await this.albumsService.findById(id);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new UnprocessableEntityException('Album not found');
+      }
+      throw error;
+    }
 
-    const album = albums.find((a) => a.id === id);
-
-    if (!album) throw new UnprocessableEntityException(`Album not found`);
-
-    this.favoritesRepo.addAlbum(id);
+    await this.favoritesRepo.addAlbum(id);
   }
 
   async removeAlbum(id: string): Promise<void> {
@@ -73,13 +65,16 @@ export class FavoritesService {
   }
 
   async addTrack(id: string): Promise<void> {
-    const tracks = await this.tracksService.findAll();
+    try {
+      await this.tracksService.findById(id);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new UnprocessableEntityException('Track not found');
+      }
+      throw error;
+    }
 
-    const track = tracks.find((t) => t.id === id);
-
-    if (!track) throw new UnprocessableEntityException(`Track not found`);
-
-    this.favoritesRepo.addTrack(id);
+    await this.favoritesRepo.addTrack(id);
   }
 
   async removeTrack(id: string): Promise<void> {
