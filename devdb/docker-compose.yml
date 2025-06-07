@@ -36,13 +36,14 @@ services:
   app:
     image: vladkragelmain/nest-app
     container_name: nest_app
-    restart: always
     ports:
       - '4000:4000'
     depends_on:
       - db
     networks:
       - app-network
+    env_file:
+      - ../.env  
 
 volumes:
   rs-postgres-data:
