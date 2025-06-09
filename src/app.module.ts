@@ -7,10 +7,12 @@ import { TracksModule } from './modules/tracks';
 import { AlbumsModule } from './modules/albums';
 import { ConfigModule } from '@nestjs/config';
 import { FavoritesModule } from './modules/favorites';
+import { PrismaModule } from './prisma';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    PrismaModule,
     UsersModule,
     ArtistsModule,
     TracksModule,

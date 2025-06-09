@@ -1,2 +1,2 @@
-export * from './in-memory-tracks.repository';
+export * from './prisma-tracks.repository';
 export * from './tracks.repository';

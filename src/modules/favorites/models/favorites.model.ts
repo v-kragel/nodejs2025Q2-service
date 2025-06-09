@@ -1,5 +1,7 @@
-export interface Favorites {
-  artists: string[];
-  albums: string[];
-  tracks: string[];
-}
+import { Artist, Album, Track } from '@prisma/client';
+
+export type Favorites = {
+  artists: Artist[];
+  albums: Album[];
+  tracks: Track[];
+};

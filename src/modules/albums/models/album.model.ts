@@ -1,6 +1,5 @@
-export interface Album {
-  id: string;
-  name: string;
-  year: number;
-  artistId?: string | null;
-}
+import { Album as AlbumPrisma, Prisma } from '@prisma/client';
+
+export type Album = AlbumPrisma;
+
+export type CreateAlbumInput = Prisma.AlbumCreateInput;
