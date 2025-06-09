@@ -9,11 +9,13 @@ import { ConfigModule } from '@nestjs/config';
 import { FavoritesModule } from './modules/favorites';
 import { PrismaModule } from './prisma';
 import { LoggingService } from './common';
+import { AuthModule } from './modules/auth';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     PrismaModule,
+    AuthModule,
     UsersModule,
     ArtistsModule,
     TracksModule,

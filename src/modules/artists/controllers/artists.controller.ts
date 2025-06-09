@@ -8,16 +8,19 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { ArtistsService } from '../services';
 import { Artist } from '../models';
 import { ArtistResponseDto, CreateArtistDto, UpdateArtistDto } from '../dto';
 import { UuidParamPipe, Serialize } from '@/common';
+import { JwtAuthGuard } from '@/modules/auth';
 
 @Controller('artist')
 export class ArtistsController {
   constructor(private readonly artistsService: ArtistsService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Serialize(ArtistResponseDto)
   @Get()
   async findAll(): Promise<Artist[]> {
