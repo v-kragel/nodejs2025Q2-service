@@ -2,9 +2,10 @@ import { Module } from '@nestjs/common';
 import { TracksController } from './controllers';
 import { TracksService } from './services';
 import { PrismaTracksRepository, TracksRepository } from './repositories';
+import { AuthModule } from '../auth';
 
 @Module({
-  imports: [],
+  imports: [AuthModule],
   controllers: [TracksController],
   providers: [
     TracksService,

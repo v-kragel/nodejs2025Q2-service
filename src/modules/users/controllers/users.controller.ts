@@ -8,22 +8,26 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from '../services';
 import { CreateUserDto, UpdateUserDto, UserResponseDto } from '../dto';
 import { User } from '../models';
 import { Serialize, UuidParamPipe } from '@/common';
+import { JwtAuthGuard } from '@/modules/auth';
 
 @Controller('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Serialize(UserResponseDto)
   @Get()
   async findAll(): Promise<User[]> {
     return await this.usersService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Serialize(UserResponseDto)
   @Get(':id')
   async findOne(
@@ -33,6 +37,7 @@ export class UsersController {
     return await this.usersService.findById(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Serialize(UserResponseDto)
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -43,6 +48,7 @@ export class UsersController {
     return await this.usersService.create(dto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Serialize(UserResponseDto)
   @Put(':id')
   @HttpCode(HttpStatus.OK)
@@ -54,6 +60,7 @@ export class UsersController {
     return await this.usersService.update(id, dto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(

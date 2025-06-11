@@ -16,15 +16,18 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  private generateToken(
-    payload: { userId: string; login: string },
-    secret: string,
-    expiresIn: string,
-  ) {
-    return this.jwtService.sign(payload, {
-      secret,
-      expiresIn,
+  generateTokens(payload: { userId: string; login: string }): TokenResponse {
+    const accessToken = this.jwtService.sign(payload, {
+      secret: process.env.JWT_SECRET_KEY,
+      expiresIn: process.env.TOKEN_EXPIRE_TIME,
     });
+
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: process.env.JWT_SECRET_REFRESH_KEY,
+      expiresIn: process.env.TOKEN_REFRESH_EXPIRE_TIME,
+    });
+
+    return { accessToken, refreshToken };
   }
 
   async signup(dto: CreateUserDto): Promise<User> {
@@ -60,18 +63,8 @@ export class AuthService {
     }
 
     const payload = { userId: existing.id, login: existing.login };
+    const tokens = this.generateTokens(payload);
 
-    return {
-      accessToken: this.generateToken(
-        payload,
-        process.env.JWT_SECRET_KEY,
-        process.env.TOKEN_EXPIRE_TIME,
-      ),
-      refreshToken: this.generateToken(
-        payload,
-        process.env.JWT_SECRET_REFRESH_KEY,
-        process.env.TOKEN_REFRESH_EXPIRE_TIME,
-      ),
-    };
+    return tokens;
   }
 }

@@ -27,6 +27,7 @@ export class ArtistsController {
     return await this.artistsService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Serialize(ArtistResponseDto)
   @Get(':id')
   async findOne(
@@ -36,6 +37,7 @@ export class ArtistsController {
     return await this.artistsService.findById(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Serialize(ArtistResponseDto)
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -46,6 +48,7 @@ export class ArtistsController {
     return await this.artistsService.create(dto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Serialize(ArtistResponseDto)
   @Put(':id')
   @HttpCode(HttpStatus.OK)
@@ -57,6 +60,7 @@ export class ArtistsController {
     return await this.artistsService.update(id, dto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(

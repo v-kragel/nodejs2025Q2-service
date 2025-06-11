@@ -1,12 +1,26 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthService } from '../services';
 import { CreateUserDto, UserResponseDto } from '@/modules/users';
 import { Serialize } from '@/common';
 import { LoginDto } from '../dto';
+import { Request, Response } from 'express';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   @Serialize(UserResponseDto)
   @Post('signup')
@@ -23,7 +37,52 @@ export class AuthController {
   async login(
     @Body()
     dto: LoginDto,
+
+    @Res({ passthrough: true })
+    res: Response,
   ) {
-    return this.authService.login(dto);
+    const { accessToken, refreshToken } = await this.authService.login(dto);
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+    });
+
+    return { accessToken };
+  }
+
+  @Post('refresh')
+  @HttpCode(HttpStatus.CREATED)
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const refreshToken = req.cookies?.refreshToken;
+
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token not found');
+    }
+
+    try {
+      const payload = this.jwtService.verify(refreshToken, {
+        secret: process.env.JWT_SECRET_REFRESH_KEY,
+      });
+
+      const tokens = this.authService.generateTokens({
+        userId: payload.userId,
+        login: payload.login,
+      });
+
+      res.cookie('refreshToken', tokens.refreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+      });
+
+      return { accessToken: tokens.accessToken };
+    } catch {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
   }
 }

@@ -2,9 +2,10 @@ import { Module } from '@nestjs/common';
 import { AlbumsController } from './controllers';
 import { AlbumsService } from './services';
 import { AlbumsRepository, PrismaAlbumsRepository } from './repositories';
+import { AuthModule } from '../auth';
 
 @Module({
-  imports: [],
+  imports: [AuthModule],
   controllers: [AlbumsController],
   providers: [
     AlbumsService,

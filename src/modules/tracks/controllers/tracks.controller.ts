@@ -8,22 +8,26 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { TracksService } from '../services';
 import { Serialize, UuidParamPipe } from '@/common';
 import { TrackResponseDto, CreateTrackDto, UpdateTrackDto } from '../dto';
 import { Track } from '../models';
+import { JwtAuthGuard } from '@/modules/auth';
 
 @Controller('track')
 export class TracksController {
   constructor(private readonly tracksService: TracksService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Serialize(TrackResponseDto)
   @Get()
   async findAll() {
     return await this.tracksService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Serialize(TrackResponseDto)
   @Get(':id')
   async findOne(
@@ -33,6 +37,7 @@ export class TracksController {
     return await this.tracksService.findById(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Serialize(TrackResponseDto)
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -43,6 +48,7 @@ export class TracksController {
     return await this.tracksService.create(dto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Serialize(TrackResponseDto)
   @Put(':id')
   @HttpCode(HttpStatus.OK)
@@ -54,6 +60,7 @@ export class TracksController {
     return await this.tracksService.update(id, dto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(
