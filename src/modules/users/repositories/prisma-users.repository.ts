@@ -18,6 +18,12 @@ export class PrismaUsersRepository implements UsersRepository {
     return user;
   }
 
+  async findByLogin(login: string): Promise<User | null> {
+    const user = await this.prisma.user.findFirst({ where: { login } });
+    if (!user) return null;
+    return user;
+  }
+
   async create(user: User): Promise<User> {
     return await this.prisma.user.create({ data: { ...user } });
   }

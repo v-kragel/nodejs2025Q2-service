@@ -8,23 +8,26 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { AlbumsService } from '../services';
-import { Serialize } from '@/common/decorators';
+import { Serialize, UuidParamPipe } from '@/common';
 import { AlbumResponseDto, CreateAlbumDto, UpdateAlbumDto } from '../dto';
-import { UuidParamPipe } from '@/common/pipes';
 import { Album } from '../models';
+import { JwtAuthGuard } from '@/modules/auth';
 
 @Controller('album')
 export class AlbumsController {
   constructor(private readonly albumsService: AlbumsService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Serialize(AlbumResponseDto)
   @Get()
   async findAll() {
     return await this.albumsService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Serialize(AlbumResponseDto)
   @Get(':id')
   async findOne(
@@ -34,6 +37,7 @@ export class AlbumsController {
     return await this.albumsService.findById(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Serialize(AlbumResponseDto)
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -44,6 +48,7 @@ export class AlbumsController {
     return await this.albumsService.create(dto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Serialize(AlbumResponseDto)
   @Put(':id')
   @HttpCode(HttpStatus.OK)
@@ -55,6 +60,7 @@ export class AlbumsController {
     return await this.albumsService.update(id, dto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(

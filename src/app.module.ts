@@ -8,11 +8,14 @@ import { AlbumsModule } from './modules/albums';
 import { ConfigModule } from '@nestjs/config';
 import { FavoritesModule } from './modules/favorites';
 import { PrismaModule } from './prisma';
+import { LoggingService } from './common';
+import { AuthModule } from './modules/auth';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     PrismaModule,
+    AuthModule,
     UsersModule,
     ArtistsModule,
     TracksModule,
@@ -20,6 +23,6 @@ import { PrismaModule } from './prisma';
     FavoritesModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, LoggingService],
 })
 export class AppModule {}

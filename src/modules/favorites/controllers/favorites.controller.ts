@@ -8,8 +8,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { FavoritesService } from '../services';
-import { UuidParamPipe } from '@/common/pipes';
-import { Serialize } from '@/common/decorators';
+import { UuidParamPipe, Serialize } from '@/common';
 import { FavoritesResponseDto } from '../dto';
 
 @Controller('favs')

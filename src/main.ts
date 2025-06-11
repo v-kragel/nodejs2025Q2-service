@@ -1,19 +1,37 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
-import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
-import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { ValidationPipe } from '@nestjs/common';
+import { AppModule } from './app.module';
+import {
+  GlobalExceptionFilter,
+  LoggingInterceptor,
+  LoggingService,
+} from './common';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.use(cookieParser());
+  app.enableCors({ origin: '*', credentials: true });
+
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT') || 4000;
 
-  app.useGlobalFilters(new GlobalExceptionFilter());
+  const loggingService = app.get(LoggingService);
 
-  app.useGlobalInterceptors(new LoggingInterceptor());
+  process.on('uncaughtException', (error: Error) => {
+    loggingService.logError('UncaughtException', '/', '-', error);
+    process.exit(1);
+  });
+
+  process.on('unhandledRejection', (reason: any) => {
+    loggingService.logError('UnhandledRejection', '/', '-', reason);
+  });
+
+  app.useGlobalFilters(new GlobalExceptionFilter(loggingService));
+
+  app.useGlobalInterceptors(new LoggingInterceptor(loggingService));
 
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidUnknownValues: true }),

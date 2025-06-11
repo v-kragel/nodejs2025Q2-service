@@ -30,6 +30,10 @@ export class UsersService {
     return user;
   }
 
+  async findByLogin(login: string): Promise<User | null> {
+    return await this.usersRepo.findByLogin(login);
+  }
+
   async create(dto: CreateUserDto): Promise<User> {
     const user: CreateUserInput = {
       id: v4(),
